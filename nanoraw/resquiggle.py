@@ -21,7 +21,7 @@ import option_parsers
 import nanoraw_helper as nh
 
 VERBOSE = False
-
+RNA = True
 # allow this many times the alignment batch size into the queue of
 # reads to be resquiggled
 ALIGN_BATCH_MULTIPLIER = 5
@@ -844,6 +844,17 @@ def get_read_data(fast5_fn, basecall_group, basecall_subgroup):
             'Error getting channel information and closing fast5 file.')
 
     read_id = raw_attrs['read_id']
+    if RNA:
+        read_id = raw_attrs['read_id']
+        # print((called_dat["start"] / float(channel_info.sampling_rate)) + (raw_attrs['start_time'] / channel_info.sampling_rate))
+        # print(called_dat["length"] / float(channel_info.sampling_rate))
+        # print(raw_attrs['start_time'])
+        # print(channel_info.sampling_rate)
+        new_dat = np.array(called_dat, dtype=[('mean', '<f4'), ('start', '<f4'), ('stdv', '<f4'), ('length', '<f4'),
+                                              ('model_state', 'S5'), ('move', '<i4'), ('p_model_state', '<f4'), ('weights', '<f4')])
+        new_dat['start'] = (called_dat["start"] / float(channel_info.sampling_rate)) + (raw_attrs['start_time'] / channel_info.sampling_rate)
+        new_dat['length'] = called_dat["length"] / float(channel_info.sampling_rate)
+        called_dat = new_dat
 
     abs_event_start = np.round(
         called_dat['start'][0].astype(np.float64) *
@@ -1115,8 +1126,10 @@ def resquiggle_all_reads(
 
 def resquiggle_main(args):
     global VERBOSE
+    global RNA
     VERBOSE = not args.quiet
-
+    RNA = args.rna
+    print(RNA)
     # currently required, but adding new mappers shortly
     if args.graphmap_executable is None:
         if args.bwa_mem_executable is None:

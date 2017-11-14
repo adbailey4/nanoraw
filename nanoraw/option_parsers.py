@@ -305,6 +305,9 @@ quiet_opt=(('--quiet', '-q'), {
 help_opt=(('--help', '-h'), {
     'action':'help',
     'help':"Print this help message and exit"})
+rna_opt=(('--rna'), {'action': 'store_true',
+                     'default': False,
+                     'help': "Only use for direct RNA reads, must have reverse strand reference sequence"})
 
 
 
@@ -328,6 +331,7 @@ def get_resquiggle_parser():
     filt_args = parser.add_argument_group('Read Filtering Arguments')
     filt_args.add_argument(timeout_opt[0], **timeout_opt[1])
     filt_args.add_argument(cpt_opt[0], **cpt_opt[1])
+    filt_args.add_argument(rna_opt[0], **rna_opt[1])
 
     norm_args = parser.add_argument_group('Read Normalization Arguments')
     norm_args.add_argument(normtype_opt[0], **normtype_opt[1])
